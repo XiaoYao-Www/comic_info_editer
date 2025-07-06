@@ -33,11 +33,11 @@ class AppSettingTab(QWidget):
         # 加入主 Layout
         self.setLayout(layout)
 
-        # 功能定義
+        # 功能建構
         self.functional_construction()
 
     def functional_construction(self):
-        """ 功能定義 """
+        """ 功能建構 """
         self.font_size_spin.valueChanged.connect(
             lambda value: SignalBus.appSetting.fontSizeChanged.emit(value)
         )
