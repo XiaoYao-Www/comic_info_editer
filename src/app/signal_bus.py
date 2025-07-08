@@ -11,6 +11,9 @@ class AppSettingSignals(QObject):
 class SignalBus_C(QObject):
     """ 信號總線 """
     dataUpdated = Signal(dict)
+    comicSelected = Signal(list)
+    metadataUpdated = Signal(dict)
+    getMetadata = Signal()
 
     def __init__(self):
         super().__init__()
