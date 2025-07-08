@@ -1,0 +1,1 @@
+nuitka --standalone --enable-plugin=pyside6 --include-qt-plugins=platforms,styles --noinclude-qt-translations --python-flag=-O --plugin-enable=upx --output-dir=release app.py
