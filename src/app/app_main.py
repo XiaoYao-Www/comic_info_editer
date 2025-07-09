@@ -2,8 +2,10 @@ from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QListWidget, QFileDialog, QLineEdit,
     QMessageBox, QComboBox, QAbstractItemView, QTabWidget,
-    QTextEdit, QProgressBar, QSpinBox, QScrollArea, QSizePolicy
+    QTextEdit, QProgressBar, QSpinBox, QScrollArea, QSizePolicy,
 )
+from PySide6.QtGui import QKeySequence, QShortcut
+from PySide6.QtCore import Qt
 from .signal_bus import SignalBus
 from .global_data_store import GlobalDataStore
 from .comics_list_tab import ComicsListTab
@@ -29,8 +31,21 @@ class ComicInfoEditor(QWidget):
         # 初始化 UI
         self.init_ui()
 
+        # 快捷鍵
+        self.tab_shortcut_s = QShortcut(QKeySequence("S"), self)
+        self.tab_shortcut_a = QShortcut(QKeySequence("A"), self)
+        self.tab_shortcut_alt_s = QShortcut(QKeySequence("Alt+S"), self)
+        self.tab_shortcut_alt_a = QShortcut(QKeySequence("Alt+A"), self)
+
+        self.tab_shortcut_alt_s.setContext(Qt.ApplicationShortcut)
+        self.tab_shortcut_alt_a.setContext(Qt.ApplicationShortcut)
+
         # 信號連接
         SignalBus.appSetting.fontSizeChanged.connect(self.change_font_size)
+        self.tab_shortcut_s.activated.connect(lambda: self.tabs.setCurrentIndex((self.tabs.currentIndex() + 1) % self.tabs.count()))
+        self.tab_shortcut_a.activated.connect(lambda: self.tabs.setCurrentIndex((self.tabs.currentIndex() - 1) if self.tabs.currentIndex() > 0 else self.tabs.count() - 1))
+        self.tab_shortcut_alt_s.activated.connect(lambda: self.tabs.setCurrentIndex((self.tabs.currentIndex() + 1) % self.tabs.count()))
+        self.tab_shortcut_alt_a.activated.connect(lambda: self.tabs.setCurrentIndex((self.tabs.currentIndex() - 1) if self.tabs.currentIndex() > 0 else self.tabs.count() - 1))
 
     def init_ui(self):
         """ 初始化UI元件 """
@@ -58,4 +73,3 @@ class ComicInfoEditor(QWidget):
         font = self.font()
         font.setPointSize(size)
         self.setFont(font)
-
