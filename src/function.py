@@ -161,13 +161,13 @@ def write_comicinfo_in_place(old_zip_path, new_zip_path, data: dict):
         if os.path.exists(temp_zip_path):
             os.remove(temp_zip_path)
 
-def write_comicinfo_flatten(zip_path, data: dict):
+def write_comicinfo_flatten(old_zip_path, new_zip_path, data: dict):
     """ 鋪平化寫入 ComicInfo.xml """
-    temp_zip_path = zip_path + ".tmp"
+    temp_zip_path = new_zip_path + ".tmp"
     seen = set()
 
     try:
-        with zipfile.ZipFile(zip_path, 'r') as zin, zipfile.ZipFile(temp_zip_path, 'w', zipfile.ZIP_STORED) as zout:
+        with zipfile.ZipFile(old_zip_path, 'r') as zin, zipfile.ZipFile(temp_zip_path, 'w', zipfile.ZIP_STORED) as zout:
             for item in zin.infolist():
                 filename = os.path.basename(item.filename)
 
@@ -175,7 +175,7 @@ def write_comicinfo_flatten(zip_path, data: dict):
                     continue  # 全部捨棄 ComicInfo.xml，待會重寫
 
                 if filename in seen:
-                    continue  # 同名檔案 → 跳過（後者覆蓋前者）
+                    continue  # 同名檔案 → 跳過
                 seen.add(filename)
 
                 with zin.open(item) as f:
@@ -183,7 +183,7 @@ def write_comicinfo_flatten(zip_path, data: dict):
 
             zout.writestr("ComicInfo.xml", generate_comicinfo(data))
 
-        os.replace(temp_zip_path, zip_path)
+        os.replace(temp_zip_path, new_zip_path)
 
     except Exception as e:
         # print(f"❌ 重整 ComicInfo.xml 寫入失敗: {e}")

@@ -23,6 +23,7 @@ class ComicInfoEditor(QWidget):
             "output_ext": ".cbz",
             "file_list": [],
             "file_metadata_cache": {},
+            "write_mode": self.tr("原位置寫入"),
         })
 
         # 初始化 UI

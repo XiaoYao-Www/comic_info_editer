@@ -27,6 +27,19 @@ class AppSettingTab(QWidget):
         font_size_layout.addWidget(self.font_size_spin, stretch=7)
         layout.addLayout(font_size_layout)
 
+        # 寫入模式切換
+        write_mode_layout = QHBoxLayout()
+        write_mode_label = QLabel(self.tr("寫入模式："))
+        self.write_mode_combo = QComboBox()
+        self.write_mode_combo.addItems([
+            self.tr("原位置寫入"),
+            self.tr("鋪平寫入"),
+        ])
+        self.write_mode_combo.setCurrentIndex(0)
+        write_mode_layout.addWidget(write_mode_label, stretch=1)
+        write_mode_layout.addWidget(self.write_mode_combo, stretch=7)
+        layout.addLayout(write_mode_layout)
+
         # 向上對其
         layout.addStretch()
 
@@ -40,4 +53,9 @@ class AppSettingTab(QWidget):
         """ 功能建構 """
         self.font_size_spin.valueChanged.connect(
             lambda value: SignalBus.appSetting.fontSizeChanged.emit(value)
+        )
+        self.write_mode_combo.currentTextChanged.connect(
+            lambda value: self.store.update({
+                "write_mode": value,
+            })
         )

@@ -9,7 +9,7 @@ import os
 from natsort import natsorted
 from .global_data_store import GlobalDataStore
 from .signal_bus import SignalBus
-from ..function import read_comicinfo_xml, write_comicinfo_in_place
+from ..function import read_comicinfo_xml, write_comicinfo_in_place, write_comicinfo_flatten
 
 class ComicsListTab(QWidget):
     def __init__(self):
@@ -36,7 +36,7 @@ class ComicsListTab(QWidget):
         self.meta_sort_combo = QComboBox() # 排序依據
         self.meta_sort_combo.addItems([
             self.tr("檔名"),
-            # self.tr("編號"),
+            self.tr("編號"),
             self.tr("手動")
         ])
         h_action0_0.addWidget(QLabel(self.tr("排序依據：")), stretch=1)
@@ -159,7 +159,17 @@ class ComicsListTab(QWidget):
         if key == self.tr("檔名"):
             file_list = natsorted(file_list)
         elif key == self.tr("編號"):
-            pass
+            file_metadata_cache = self.store.get("file_metadata_cache")
+            file_list = sorted(
+                            file_list,
+                            key=lambda x: int(
+                                file_metadata_cache
+                                    .get(x, {})
+                                    .get("_fields", {})
+                                    .get("base", {})
+                                    .get("Number", len(file_list) + 1)
+                                )
+                        )
         else:
             return
         # 刷新
@@ -272,7 +282,11 @@ class ComicsListTab(QWidget):
             }, orig_meta, metadata)
 
             # 寫入 metadata
-            write_comicinfo_in_place(src_path, dst_path, updated_meta)
+            write_mode = self.store.get("write_mode")
+            if write_mode == self.tr("鋪平寫入"):
+                write_comicinfo_flatten(src_path, dst_path, updated_meta)
+            else:
+                write_comicinfo_in_place(src_path, dst_path, updated_meta)
 
             # 更新進度條
             self.progress_bar.setValue(self.progress_bar.value() + 1)
