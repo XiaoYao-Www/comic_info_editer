@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 from .signal_bus import SignalBus
 from .global_data_store import GlobalDataStore
 from .comics_list_tab import ComicsListTab
-from .info_editer_tab import InfoEditorTab
+from .info_editor_tab import InfoEditorTab
 from .app_setting_tab import AppSettingTab
 from .app_info_tab import AppInfoTab
 
