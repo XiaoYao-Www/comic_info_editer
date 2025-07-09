@@ -1,1 +1,1 @@
-# comic_info_editer
+# comic_info_editor
