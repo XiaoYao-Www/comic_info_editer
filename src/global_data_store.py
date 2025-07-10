@@ -38,10 +38,16 @@ class _GlobalDataStore:
                 traceback.print_exc()
     
     def update(self, new_data: Dict[str, Any]) -> None:
-        """ 批量更新數據 """
+        """ 批量更新數據（若資料實際變更才通知） """
+        changed = {}
         with self._mutex:
-            self._data.update(new_data)
-        self._notify(new_data)
+            for key, new_value in new_data.items():
+                old_value = self._data.get(key)
+                if old_value != new_value:
+                    self._data[key] = new_value
+                    changed[key] = new_value
+        if changed:
+            self._notify(changed)
     
     def get(self, key: str, default: Optional[Any] = None) -> Any:
         """ 獲取單個值 """
@@ -49,8 +55,11 @@ class _GlobalDataStore:
             return self._data.get(key, default)
     
     def set(self, key: str, value: Any) -> None:
-        """ 設置單個值 """
+        """ 設置單個值（若資料實際變更才通知） """
         with self._mutex:
+            old_value = self._data.get(key)
+            if old_value == value:
+                return
             self._data[key] = value
         self._notify({key: value})
     
