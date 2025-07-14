@@ -5,6 +5,7 @@ class _WriteFileSignal(QObject):
     """ 介面變更訊號 """
     inPlace = Signal(str, str, dict)
     flatten = Signal(str, str, dict)
+    writeFolderToZip = Signal(str, str, dict)
 
     def __init__(self):
         super().__init__()
@@ -24,6 +25,8 @@ class _AppSettingSignals(QObject):
     """ 應用設定訊號 """
     fontSizeChanged = Signal(int)
     writeModeChanged = Signal(int)
+    imageExtChanged = Signal(list)
+    allowFilesChanged = Signal(list)
 
     def __init__(self):
         super().__init__()

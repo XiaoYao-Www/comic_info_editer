@@ -7,6 +7,8 @@ from PySide6.QtWidgets import (
 # 自定庫
 from src.classes.ui.smart_integer_field import SmartIntegerField
 
+VERSION = "1.0.1"
+
 schema_config = {
     "基本資訊": {
         "Title": {

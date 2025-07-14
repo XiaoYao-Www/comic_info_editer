@@ -66,11 +66,16 @@ class DataProcess(QObject):
             }, orig_comic_info, self.info_editor_input)
 
             # 寫入 comicInfo
-            write_mode = GLOBAL_DATA_STORE.get("write_mode")
-            if write_mode == 1: # 鋪平寫入
-                SIGNAL_BUS.writeFile.flatten.emit(src_path, dst_path, updated_meta)
-            else: # 原位置寫入
-                SIGNAL_BUS.writeFile.inPlace.emit(src_path, dst_path, updated_meta)
+            if os.path.isdir(src_path):
+                # 資料夾
+                SIGNAL_BUS.writeFile.writeFolderToZip.emit(src_path, dst_path, updated_meta)
+            else:
+                # 檔案
+                write_mode = GLOBAL_DATA_STORE.get("write_mode")
+                if write_mode == 1: # 鋪平寫入
+                    SIGNAL_BUS.writeFile.flatten.emit(src_path, dst_path, updated_meta)
+                else: # 原位置寫入
+                    SIGNAL_BUS.writeFile.inPlace.emit(src_path, dst_path, updated_meta)
 
             # 更新進度條
             progress_rate += 1

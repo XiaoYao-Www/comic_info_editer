@@ -19,6 +19,17 @@ class BackendCore(QObject):
             "file_metadata_cache": {},
             "write_mode": 0,
             "font_size": 10,
+            "image_exts": [
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".webp",
+                ".bmp",
+                ".gif",
+            ],
+            "allow_files": [
+                ".nomedia",
+            ],
         })
 
         # 後端實例化
@@ -68,6 +79,15 @@ class BackendCore(QObject):
         # 漫畫快取變更
         if "file_metadata_cache" in keys:
             SIGNAL_BUS.dataChange.fileMetadataCacheChanged.emit(GLOBAL_DATA_STORE.get("file_metadata_cache").copy())
+        # 圖片附檔名變更
+        if "image_exts" in keys:
+            print(GLOBAL_DATA_STORE.get("image_exts"))
+            SIGNAL_BUS.appSetting.imageExtChanged.emit(GLOBAL_DATA_STORE.get("image_exts").copy())
+        # 允許檔案變更
+        if "allow_files" in keys:
+            print(GLOBAL_DATA_STORE.get("allow_files"))
+            SIGNAL_BUS.appSetting.allowFilesChanged.emit(GLOBAL_DATA_STORE.get("allow_files").copy())
+
 
     def on_file_read_ready(self) -> None:
         """ 漫畫檔案讀取完成 """

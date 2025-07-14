@@ -6,6 +6,8 @@ from PySide6.QtWidgets import (
 )
 # 自訂庫
 from src.classes.ui.clickable_url_label import ClickableUrlLabel
+from src.setting import VERSION
+
 
 class AppInfoTab(QWidget):
     """ 應用關於頁 """
@@ -38,8 +40,8 @@ class AppInfoTab(QWidget):
         ## 介紹內容
         about_software_text = QTextEdit()
         about_software_text.setPlainText(
-            self.tr("版本: 1.0.0\n"
-            "一款用於編輯漫畫 ComicInfo 的編輯器")
+            self.tr("版本: {version}\n"
+            "一款用於編輯漫畫 ComicInfo 的編輯器").format(version = VERSION)
         )
         about_software_text.setReadOnly(True)
         ## github 連結
