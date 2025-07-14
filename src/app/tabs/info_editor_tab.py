@@ -10,6 +10,7 @@ from PySide6.QtCore import Qt
 from src.global_data_store import GLOBAL_DATA_STORE
 from src.signal_bus import SIGNAL_BUS
 from src.setting import schema_config
+from src.classes.ui.smart_integer_field import SmartIntegerField
 
 class InfoEditorTab(QWidget):
     def __init__(self):
@@ -64,11 +65,9 @@ class InfoEditorTab(QWidget):
                 widget_cls = field_cfg["type"]
                 if widget_cls == QComboBox:
                     widget = QComboBox()
-                    # widget.addItems(field_cfg.get("options", ["Unknown", "Yes", "No"]))
-                elif widget_cls == QSpinBox:
-                    widget = QSpinBox()
-                    # widget.setMinimum(field_cfg.get("min", -9999))
-                    # widget.setMaximum(field_cfg.get("max", 9999))
+                    widget.addItems(field_cfg.get("options", ["{保留}"]))
+                elif widget_cls == SmartIntegerField:
+                    widget = SmartIntegerField()
                 elif widget_cls == QTextEdit:
                     widget = QTextEdit()
                 else:
@@ -123,20 +122,18 @@ class InfoEditorTab(QWidget):
                     if isinstance(editor, QComboBox):
                         idx = editor.findText(display_val)
                         if idx == -1:
-                            idx = editor.findText("Unknown")
+                            idx = editor.findText("{保留}")
                         editor.setCurrentIndex(idx)
                     elif isinstance(editor, QTextEdit):
                         editor.setPlainText(display_val)
-                    elif isinstance(editor, QSpinBox):
-                        if display_val == "{保留}" or display_val == "":
-                            editor.setSpecialValueText("{保留}")
-                            editor.setValue(editor.minimum())
+                    elif isinstance(editor, SmartIntegerField):
+                        if display_val == "{保留}" or display_val == "" or display_val == "-1":
+                            editor.setValue(display_val)
                         else:
-                            editor.setSpecialValueText("")
                             try:
                                 editor.setValue(int(display_val))
                             except ValueError:
-                                editor.setValue(editor.minimum())
+                                editor.setValue("{保留}")
                     else:
                         editor.setText(display_val)
         finally:
@@ -153,26 +150,20 @@ class InfoEditorTab(QWidget):
                     val = editor.currentText()
                     if val == "{保留}":
                         continue
-                    elif val == "":
-                        continue
                     result['_fields']['base'][info_key] = editor.currentText()
                 elif isinstance(editor, QTextEdit):
                     val = editor.toPlainText()
                     if val == "{保留}":
                         continue
-                    elif val == "":
-                        continue
                     result['_fields']['base'][info_key] = editor.toPlainText()
-                elif isinstance(editor, QSpinBox):
-                    text = editor.text()
-                    if text == "{保留}":
-                        continue  # 跳過保留值
-                    result['_fields']['base'][info_key] = str(editor.value())
+                elif isinstance(editor, SmartIntegerField):
+                    value = editor.value()
+                    if value == "{保留}" or value == "-1":
+                        continue
+                    result['_fields']['base'][info_key] = value
                 else:
                     val = editor.text()
                     if val == "{保留}":
-                        continue
-                    elif val == "":
                         continue
                     result['_fields']['base'][info_key] = val
         SIGNAL_BUS.returnInfoEditorInput.emit(result)

@@ -63,19 +63,20 @@ def generate_comicinfo(data: dict) -> bytes:
     # 處理單值欄位
     for prefix, fields in data.get('_fields', {}).items():
         for tag, value in fields.items():
-            if not value.strip():
+            value_str = str(value)
+            if not value_str.strip():
                 continue  # 忽略空白字串
 
             if prefix == 'base':
                 # base prefix 無 namespace，直接新增子元素
                 el = ET.SubElement(root, tag)
-                el.text = value
+                el.text = value_str
             else:
                 # 強制使用指定前綴（即使 namespace URI 相同）
                 namespace_uri = nsmap[prefix]
                 qname = QName(namespace_uri, tag)  # 建立帶前綴的 QName
                 el = ET.SubElement(root, qname.text, nsmap={prefix: namespace_uri})
-                el.text = value
+                el.text = value_str
 
     # 處理複合欄位（有屬性和子元素）
     for prefix, groups in data.get('_complex', {}).items():

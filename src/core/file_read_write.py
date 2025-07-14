@@ -87,6 +87,7 @@ class FileReadWrite(QObject):
             os.replace(temp_zip_path, new_zip_path)
 
         except Exception as e:
+            print(f"❌ ComicInfo 寫入錯誤：{e}")
             if os.path.exists(temp_zip_path):
                 os.remove(temp_zip_path)
 
@@ -115,5 +116,6 @@ class FileReadWrite(QObject):
             os.replace(temp_zip_path, new_zip_path)
 
         except Exception as e:
+            print(f"❌ ComicInfo 寫入錯誤：{e}")
             if os.path.exists(temp_zip_path):
                 os.remove(temp_zip_path)
