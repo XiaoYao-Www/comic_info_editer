@@ -35,10 +35,10 @@ class InfoEditorTab(QWidget):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         for section_key, fields in schema_config.items():
-            toggle_button = QToolButton(text=self.tr(section_key), checkable=True, checked=True)
+            toggle_button = QToolButton(text=self.tr(section_key), checkable=True, checked=False)
             toggle_button.setStyleSheet("QToolButton { border: none; }")
             toggle_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-            toggle_button.setArrowType(Qt.DownArrow)
+            toggle_button.setArrowType(Qt.RightArrow)
 
             content_area = QWidget()
             content_layout = QVBoxLayout()
@@ -48,6 +48,7 @@ class InfoEditorTab(QWidget):
             scroll = QScrollArea()
             scroll.setWidgetResizable(True)
             scroll.setWidget(content_area)
+            scroll.setVisible(False)
 
             def make_toggle_func(button=toggle_button, area=scroll):
                 return lambda checked: (button.setArrowType(Qt.DownArrow if checked else Qt.RightArrow), area.setVisible(checked))
@@ -60,6 +61,7 @@ class InfoEditorTab(QWidget):
             for field_key, field_cfg in fields.items():
                 hlayout = QHBoxLayout()
                 label = QLabel(self.tr(field_cfg["label"]))
+                label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
                 hlayout.addWidget(label, stretch=1)
 
                 widget_cls = field_cfg["type"]

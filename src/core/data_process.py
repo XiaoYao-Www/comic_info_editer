@@ -60,9 +60,11 @@ class DataProcess(QObject):
             orig_comic_info = GLOBAL_DATA_STORE.get("file_metadata_cache", {}).get(rel_path, {})
 
             # 修改 comicInfo
+            file_name: str = os.path.basename(rel_path).split(".")[0]
             updated_meta = update_comicinfo_data({
-                "fileName": os.path.basename(rel_path).split(".")[0],
-                "index": idx + 1
+                "fileName": file_name,
+                "index": idx + 1,
+                "fileNameClear": file_name.replace("🔒", "").strip()
             }, orig_comic_info, self.info_editor_input)
 
             # 寫入 comicInfo
