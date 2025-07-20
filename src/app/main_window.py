@@ -14,6 +14,8 @@ from src.app.tabs.app_info_tab import AppInfoTab
 from src.app.tabs.app_setting_tab import AppSettingTab
 from src.app.tabs.comics_list_tab import ComicsListTab
 from src.app.tabs.info_editor_tab import InfoEditorTab
+## 翻譯
+from src.translations import TR
 
 class ComicInfoEditor(QWidget):
     """ 漫畫資訊編輯器 - 主窗口 """
@@ -23,7 +25,7 @@ class ComicInfoEditor(QWidget):
         self.init_ui()
 
         # 應用設定
-        self.setWindowTitle(self.tr("ComicInfo 編輯器"))
+        self.setWindowTitle(TR.UI_CONSTANTS["ComicInfo 編輯器"]())
         self.resize(900, 750)
         self.change_font_size(GLOBAL_DATA_STORE.get("font_size", 10))
 
@@ -35,18 +37,19 @@ class ComicInfoEditor(QWidget):
 
         
     ### 初始化函式 ###
+    
     def init_ui(self):
         """ UI初始化 """
         # 標籤頁
         self.tabs = QTabWidget()
         self.comics_list_tab = ComicsListTab()
-        self.tabs.addTab(self.comics_list_tab, self.tr("列表"))
+        self.index_comics = self.tabs.addTab(self.comics_list_tab, TR.UI_CONSTANTS["列表"]())
         self.info_editor_tab = InfoEditorTab()
-        self.tabs.addTab(self.info_editor_tab, self.tr("編輯"))
+        self.index_info = self.tabs.addTab(self.info_editor_tab, TR.UI_CONSTANTS["編輯"]())
         self.app_setting_tab = AppSettingTab()
-        self.tabs.addTab(self.app_setting_tab, self.tr("設定"))
+        self.index_setting = self.tabs.addTab(self.app_setting_tab, TR.UI_CONSTANTS["設定"]())
         self.app_info_tab = AppInfoTab()
-        self.tabs.addTab(self.app_info_tab, self.tr("關於"))
+        self.index_about = self.tabs.addTab(self.app_info_tab, TR.UI_CONSTANTS["關於"]())
 
         # 結構組合
         self.layout = QVBoxLayout()
@@ -77,8 +80,11 @@ class ComicInfoEditor(QWidget):
         # 訊息框
         SIGNAL_BUS.ui.sendCritical.connect(self.send_critical)
         SIGNAL_BUS.ui.sendInformation.connect(self.send_information)
+        # 語言刷新
+        SIGNAL_BUS.ui.retranslateUi.connect(self.retranslateUi)
 
     ### 功能函式 ###
+
     def change_font_size(self, size):
         """ 更改字型大小 """
         font = self.font()
@@ -100,3 +106,17 @@ class ComicInfoEditor(QWidget):
     def send_information(self, title, text) -> None:
         """ 顯示提示訊息 """
         QMessageBox.information(self, title, text)
+
+    def retranslateUi(self):
+        """ UI 語言刷新 """
+        self.setWindowTitle(TR.UI_CONSTANTS["ComicInfo 編輯器"]())
+        #
+        self.tabs.setTabText(self.index_comics, TR.UI_CONSTANTS["列表"]())
+        self.tabs.setTabText(self.index_info, TR.UI_CONSTANTS["編輯"]())
+        self.tabs.setTabText(self.index_setting, TR.UI_CONSTANTS["設定"]())
+        self.tabs.setTabText(self.index_about, TR.UI_CONSTANTS["關於"]())
+        #
+        self.comics_list_tab.retranslateUi()
+        self.info_editor_tab.retranslateUi()
+        self.app_setting_tab.retranslateUi()
+        self.app_info_tab.retranslateUi()

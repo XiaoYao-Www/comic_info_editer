@@ -8,6 +8,8 @@ from PySide6.QtCore import Qt, QSignalBlocker
 # 自訂庫
 from src.signal_bus import SIGNAL_BUS
 from src.global_data_store import GLOBAL_DATA_STORE
+## 翻譯
+from src.translations import TR
 
 class AppSettingTab(QWidget):
     def __init__(self):
@@ -27,52 +29,63 @@ class AppSettingTab(QWidget):
         """ 初始化UI元件 """
         # 字體大小設定
         font_size_layout = QHBoxLayout()
-        font_size_label = QLabel(self.tr("字體大小："))
+        self.font_size_label = QLabel(TR.UI_CONSTANTS["字體大小："]())
         self.font_size_spin = QSpinBox()
         self.font_size_spin.setRange(8, 30)
         self.font_size_spin.setValue(GLOBAL_DATA_STORE.get("font_size")) # 載入初始值
 
         # 寫入模式切換
         write_mode_layout = QHBoxLayout()
-        write_mode_label = QLabel(self.tr("寫入模式："))
+        self.write_mode_label = QLabel(TR.UI_CONSTANTS["寫入模式："]())
         self.write_mode_combo = QComboBox()
         self.write_mode_combo.addItems([
-            self.tr("原位置寫入"),
-            self.tr("鋪平寫入"),
+            TR.UI_CONSTANTS["原位置寫入"](),
+            TR.UI_CONSTANTS["鋪平寫入"](),
         ])
         self.write_mode_combo.setCurrentIndex(GLOBAL_DATA_STORE.get("write_mode")) # 載入初始值
 
         # 圖片附檔名
         image_extension_layout = QHBoxLayout()
-        image_extension_label = QLabel(self.tr("圖片附檔名："))
+        self.image_extension_label = QLabel(TR.UI_CONSTANTS["圖片附檔名："]())
         self.image_extension_edit = QLineEdit()
         self.image_extension_edit.setText(', '.join(GLOBAL_DATA_STORE.get("image_exts"))) # 載入初始值
 
         # 允許檔案
         allow_files_layout = QHBoxLayout()
-        allow_files_label = QLabel(self.tr("允許檔案："))
+        self.allow_files_label = QLabel(TR.UI_CONSTANTS["允許檔案："]())
         self.allow_files_edit = QLineEdit()
         self.allow_files_edit.setText(', '.join(GLOBAL_DATA_STORE.get("allow_files"))) # 載入初始值
+
+        # 語言選擇
+        lang_select_layout = QHBoxLayout()
+        self.lang_select_label = QLabel(TR.UI_CONSTANTS["語言選擇："]())
+        self.lang_select_combo = QComboBox()
+        self.lang_select_combo.addItems(GLOBAL_DATA_STORE.get("langFileData").keys())
+        self.lang_select_combo.setCurrentText(GLOBAL_DATA_STORE.get("selectedLang")) # 載入預設值
 
         # 結構組合
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         ## 字體大小
-        font_size_layout.addWidget(font_size_label, stretch=1)
+        font_size_layout.addWidget(self.font_size_label, stretch=1)
         font_size_layout.addWidget(self.font_size_spin, stretch=4)
         layout.addLayout(font_size_layout)
         ## 寫入模式
-        write_mode_layout.addWidget(write_mode_label, stretch=1)
+        write_mode_layout.addWidget(self.write_mode_label, stretch=1)
         write_mode_layout.addWidget(self.write_mode_combo, stretch=4)
         layout.addLayout(write_mode_layout)
         # 圖片附檔名
-        image_extension_layout.addWidget(image_extension_label, stretch=1)
+        image_extension_layout.addWidget(self.image_extension_label, stretch=1)
         image_extension_layout.addWidget(self.image_extension_edit, stretch=4)
         layout.addLayout(image_extension_layout)
         # 允許檔案
-        allow_files_layout.addWidget(allow_files_label, stretch=1)
+        allow_files_layout.addWidget(self.allow_files_label, stretch=1)
         allow_files_layout.addWidget(self.allow_files_edit, stretch=4)
         layout.addLayout(allow_files_layout)
+        # 選擇語言
+        lang_select_layout.addWidget(self.lang_select_label, stretch=1)
+        lang_select_layout.addWidget(self.lang_select_combo, stretch=4)
+        layout.addLayout(lang_select_layout)
         ## 主要輸出
         self.setLayout(layout)
 
@@ -86,6 +99,10 @@ class AppSettingTab(QWidget):
         SIGNAL_BUS.appSetting.imageExtChanged.connect(self.image_extension_changed_display)
         # 允許檔案變換
         SIGNAL_BUS.appSetting.allowFilesChanged.connect(self.allow_files_changed_display)
+        # 語言刷新
+        # SIGNAL_BUS.ui.retranslateUi.connect(self.retranslateUi)
+        # 語言變換顯示
+        SIGNAL_BUS.appSetting.langChanged.connect(self.lang_selected_changed_display)
 
     def functional_construction(self):
         """ 功能架構 """
@@ -97,8 +114,11 @@ class AppSettingTab(QWidget):
         self.image_extension_edit.textChanged.connect(self.write_image_extension)
         # 允許檔案
         self.allow_files_edit.textChanged.connect(self.write_allow_files)
+        # 語言選擇
+        self.lang_select_combo.currentTextChanged.connect(self.write_lang_selected)
 
     ### 功能函式 ###
+    
     def write_font_size(self, font_size: int) -> None:
         """ 字體大小寫入 """
         GLOBAL_DATA_STORE.set("font_size", font_size)
@@ -134,3 +154,33 @@ class AppSettingTab(QWidget):
     def write_allow_files(self, allow_files: str) -> None:
         """ 允許檔案寫入 """
         GLOBAL_DATA_STORE.set("allow_files", [item.strip() for item in allow_files.split(',')])
+
+    def lang_selected_changed_display(self, selectedLang: str) -> None:
+        """ 語言選擇變換顯示 """
+        with QSignalBlocker(self.lang_select_combo):
+            self.lang_select_combo.setCurrentText(selectedLang)
+
+    def write_lang_selected(self, selectedLang: str) -> None:
+        """ 寫入語言選擇 """
+        GLOBAL_DATA_STORE.set("selectedLang", selectedLang)
+
+    def retranslateUi(self):
+        """ UI 語言刷新 """
+        self.font_size_label.setText(TR.UI_CONSTANTS["字體大小："]())
+        #
+        self.write_mode_label.setText(TR.UI_CONSTANTS["寫入模式："]())
+        # 刷新 QComboBox 的文字但保留目前選取
+        current_index = self.write_mode_combo.currentIndex()
+        self.write_mode_combo.clear()
+        self.write_mode_combo.addItems([
+            TR.UI_CONSTANTS["原位置寫入"](),
+            TR.UI_CONSTANTS["鋪平寫入"](),
+        ])
+        with QSignalBlocker(self.write_mode_combo):
+            self.write_mode_combo.setCurrentIndex(current_index)
+        #
+        self.image_extension_label.setText(TR.UI_CONSTANTS["圖片附檔名："]())
+        #
+        self.allow_files_label.setText(TR.UI_CONSTANTS["允許檔案："]())
+        #
+        self.lang_select_label.setText(TR.UI_CONSTANTS["語言選擇："]())

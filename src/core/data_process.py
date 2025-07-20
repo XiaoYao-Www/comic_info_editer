@@ -9,6 +9,8 @@ from typing import Any
 from src.global_data_store import GLOBAL_DATA_STORE
 from src.signal_bus import SIGNAL_BUS
 from src.function.comicinfo_process import update_comicinfo_data
+## 翻譯
+from src.translations import TR
 
 class DataProcess(QObject):
     def __init__(self):
@@ -38,13 +40,13 @@ class DataProcess(QObject):
         # 開始處理
         ## 確保可以執行
         if not GLOBAL_DATA_STORE.get("output_dir"):
-            SIGNAL_BUS.ui.sendCritical.emit(self.tr("錯誤"), self.tr("請選擇輸出資料夾"))
+            SIGNAL_BUS.ui.sendCritical.emit(TR.SEND_MESSAGE["錯誤"](), TR.SEND_MESSAGE["請選擇輸出資料夾"]())
             return
         if not GLOBAL_DATA_STORE.get("source_dir"):
-            SIGNAL_BUS.ui.sendCritical.emit(self.tr("錯誤"), self.tr("請選擇漫畫資料夾"))
+            SIGNAL_BUS.ui.sendCritical.emit(TR.SEND_MESSAGE["錯誤"](), TR.SEND_MESSAGE["請選擇漫畫資料夾"]())
             return
         if not self.selected_comic:
-            SIGNAL_BUS.ui.sendInformation.emit(self.tr("提示"), self.tr("請至少選擇一個檔案進行處理"))
+            SIGNAL_BUS.ui.sendInformation.emit(TR.SEND_MESSAGE["提示"](), TR.SEND_MESSAGE["請至少選擇一個檔案進行處理"]())
             return
         ## 初始化進度條
         SIGNAL_BUS.ui.setProgressBar.emit(0, len(self.selected_comic))
@@ -85,7 +87,7 @@ class DataProcess(QObject):
             # 強制刷新
             QApplication.processEvents()
 
-        SIGNAL_BUS.ui.sendInformation.emit(self.tr("完成"), self.tr("所有漫畫處理完成！"))
+        SIGNAL_BUS.ui.sendInformation.emit(TR.SEND_MESSAGE["完成"](), TR.SEND_MESSAGE["所有漫畫處理完成！"]())
 
     
     

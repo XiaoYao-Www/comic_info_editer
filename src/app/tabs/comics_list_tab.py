@@ -11,6 +11,8 @@ import os
 from src.global_data_store import GLOBAL_DATA_STORE
 from src.signal_bus import SIGNAL_BUS
 from src.app.model.comic_list_model import ComicListModel
+## 翻譯
+from src.translations import TR
 
 class ComicsListTab(QWidget):
     def __init__(self):
@@ -28,12 +30,13 @@ class ComicsListTab(QWidget):
         self.functional_construction()
 
     ### 初始化函式 ###
+
     def init_ui(self):
         """ 初始化UI元件 """
         # 載入漫畫資料夾
         source_path_layout = QHBoxLayout()
-        self.source_path_btn = QPushButton(self.tr("選擇漫畫資料夾"))
-        self.source_path_label = QLabel(self.tr("尚未選擇"))
+        self.source_path_btn = QPushButton(TR.UI_CONSTANTS["選擇漫畫資料夾"]())
+        self.source_path_label = QLabel(TR.UI_CONSTANTS["尚未選擇"]())
         ## 建構
         source_path_layout.addWidget(self.source_path_btn, stretch=1)
         source_path_layout.addWidget(self.source_path_label, stretch=4)
@@ -44,16 +47,17 @@ class ComicsListTab(QWidget):
         list_sort_layout = QHBoxLayout()
         self.list_sort_combo = QComboBox()
         self.list_sort_combo.addItems([
-            self.tr("手動"),
-            self.tr("檔名"),
-            self.tr("編號"),
+            TR.UI_CONSTANTS["手動"](),
+            TR.UI_CONSTANTS["檔名"](),
+            TR.UI_CONSTANTS["編號"](),
         ])
         ### 構建
-        list_sort_layout.addWidget(QLabel(self.tr("排序依據：")), stretch=1)
+        self.list_sort_label = QLabel(TR.UI_CONSTANTS["排序依據："]())
+        list_sort_layout.addWidget(self.list_sort_label, stretch=1)
         list_sort_layout.addWidget(self.list_sort_combo, stretch=1)
         ## 已選取狀態
         self.selection_status = QLabel(
-            self.tr("已選中 {selected} / 共 {total} 本漫畫").format(
+            TR.UI_CONSTANTS["已選中 {selected} / 共 {total} 本漫畫"]().format(
                 selected=0,
                 total=0
         ))
@@ -75,8 +79,8 @@ class ComicsListTab(QWidget):
         # 功能欄1
         action_layout_1 = QHBoxLayout()
         ## 選擇輸出資料夾
-        self.output_path_btn = QPushButton(self.tr("選擇輸出資料夾"))
-        self.output_path_label = QLabel(self.tr("尚未選擇"))
+        self.output_path_btn = QPushButton(TR.UI_CONSTANTS["選擇輸出資料夾"]())
+        self.output_path_label = QLabel(TR.UI_CONSTANTS["尚未選擇"]())
         ## 副檔名選擇
         ext_layout = QHBoxLayout()
         self.ext_combo = QComboBox()
@@ -85,7 +89,8 @@ class ComicsListTab(QWidget):
             "zip"
         ])
         ### 構建
-        ext_layout.addWidget(QLabel(self.tr("輸出副檔名：")), stretch=1)
+        self.ext_label = QLabel(TR.UI_CONSTANTS["輸出副檔名："]())
+        ext_layout.addWidget(self.ext_label, stretch=1)
         ext_layout.addWidget(self.ext_combo, stretch=1)
         ## 構建
         action_layout_1.addWidget(self.output_path_btn, stretch=2)
@@ -95,7 +100,7 @@ class ComicsListTab(QWidget):
         # 功能欄2
         action_layout_2 = QHBoxLayout()
         ## 開始按鈕
-        self.run_btn = QPushButton(self.tr("開始處理"))
+        self.run_btn = QPushButton(TR.UI_CONSTANTS["開始處理"]())
         ## 進度條
         self.progress_bar = QProgressBar()
         ## 構建
@@ -127,6 +132,8 @@ class ComicsListTab(QWidget):
         SIGNAL_BUS.requireSelectedComic.connect(self.get_selected_comic)
         # 進度條更新
         SIGNAL_BUS.ui.setProgressBar.connect(self.set_progress_bar)
+        # 語言刷新
+        # SIGNAL_BUS.ui.retranslateUi.connect(self.retranslateUi)
 
     def functional_construction(self):
         """ 功能建構 """
@@ -152,7 +159,7 @@ class ComicsListTab(QWidget):
 
     def select_source_folder(self) -> None:
         """ 選擇漫畫資料夾 """
-        folder = QFileDialog.getExistingDirectory(self, self.tr("選擇漫畫資料夾"))
+        folder = QFileDialog.getExistingDirectory(self, TR.UI_CONSTANTS["選擇漫畫資料夾"]())
         if folder:
             GLOBAL_DATA_STORE.update({
                 "source_dir": folder
@@ -164,7 +171,7 @@ class ComicsListTab(QWidget):
 
     def select_output_folder(self) -> None:
         """ 選擇輸出資料夾 """
-        folder = QFileDialog.getExistingDirectory(self, self.tr("選擇輸出資料夾"))
+        folder = QFileDialog.getExistingDirectory(self, TR.UI_CONSTANTS["選擇輸出資料夾"]())
         if folder:
             GLOBAL_DATA_STORE.update({
                 "output_dir": folder
@@ -188,7 +195,7 @@ class ComicsListTab(QWidget):
     def selection_status_change(self, value: int) -> None:
         """ 更新選擇狀態提式 """
         self.selection_status.setText(
-            self.tr("已選中 {selected} / 共 {total} 本漫畫").format(
+            TR.UI_CONSTANTS["已選中 {selected} / 共 {total} 本漫畫"]().format(
                 selected=value,
                 total=len(GLOBAL_DATA_STORE.get("file_list", []))
         ))
@@ -220,3 +227,33 @@ class ComicsListTab(QWidget):
         """ 設置進度條顯示 """
         self.progress_bar.setMaximum(max)
         self.progress_bar.setValue(value)
+
+    def retranslateUi(self):
+        """ UI 語言刷新 """
+        self.source_path_btn.setText(TR.UI_CONSTANTS["選擇漫畫資料夾"]())
+        self.source_path_label.setText(TR.UI_CONSTANTS["尚未選擇"]() if (GLOBAL_DATA_STORE.get("source_dir") == "") else GLOBAL_DATA_STORE.get("source_dir"))
+        # 
+        self.list_sort_label.setText(TR.UI_CONSTANTS["排序依據："]())
+        # 切換排序選項翻譯，並保持選項
+        sort_index = self.list_sort_combo.currentIndex()
+        self.list_sort_combo.clear()
+        self.list_sort_combo.addItems([
+            TR.UI_CONSTANTS["手動"](),
+            TR.UI_CONSTANTS["檔名"](),
+            TR.UI_CONSTANTS["編號"](),
+        ])
+        with QSignalBlocker(self.list_sort_combo):
+            self.list_sort_combo.setCurrentIndex(sort_index)
+        # 
+        self.selection_status.setText(
+            TR.UI_CONSTANTS["已選中 {selected} / 共 {total} 本漫畫"]().format(
+                selected=0,
+                total=len(GLOBAL_DATA_STORE.get("file_list", []))
+        ))
+        #
+        self.output_path_btn.setText(TR.UI_CONSTANTS["選擇輸出資料夾"]())
+        self.output_path_label.setText(TR.UI_CONSTANTS["尚未選擇"]() if (GLOBAL_DATA_STORE.get("output_dir") == "") else GLOBAL_DATA_STORE.get("output_dir"))
+        #
+        self.ext_label.setText(TR.UI_CONSTANTS["輸出副檔名："]())
+        #
+        self.run_btn.setText(TR.UI_CONSTANTS["開始處理"]())

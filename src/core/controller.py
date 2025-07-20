@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Signal
 from typing import Any, Dict, Optional, Set, Callable
 from natsort import natsorted
+from pathlib import Path
 # 自訂庫
 from src.signal_bus import SIGNAL_BUS
 from src.global_data_store import GLOBAL_DATA_STORE
@@ -11,6 +12,8 @@ class BackendCore(QObject):
     def __init__(self):
         super().__init__()
         # 資料集初始化
+        langFileData = self.getLangFilesData()
+        if len(langFileData) == 0: langFileData = {"無檔案": ""}
         GLOBAL_DATA_STORE.update({
             "source_dir": "",
             "output_dir": "",
@@ -30,6 +33,8 @@ class BackendCore(QObject):
             "allow_files": [
                 ".nomedia",
             ],
+            "langFileData": langFileData,
+            "selectedLang": "zh_TW" if ("zh_TW" in langFileData.keys()) else langFileData.keys()[0],
         })
 
         # 後端實例化
@@ -85,6 +90,9 @@ class BackendCore(QObject):
         # 允許檔案變更
         if "allow_files" in keys:
             SIGNAL_BUS.appSetting.allowFilesChanged.emit(GLOBAL_DATA_STORE.get("allow_files").copy())
+        # 語言變更
+        if "selectedLang" in keys:
+            SIGNAL_BUS.appSetting.langChanged.emit(GLOBAL_DATA_STORE.get("selectedLang")) # 傳遞檔案絕對路徑
 
 
     def on_file_read_ready(self) -> None:
@@ -121,6 +129,11 @@ class BackendCore(QObject):
         })
         # 刷新選擇欄顯示
         SIGNAL_BUS.ui.comicListSortDisplayChange.emit(mode)
+
+    def getLangFilesData(self, path:str = "translations"):
+        """ 取得擁有的 .qm 翻譯檔案 """
+        folder = Path(path).resolve()
+        return { file.name.replace(".qm", ""): str(file.resolve()) for file in folder.glob("*.qm")}
 
     
 

@@ -17,6 +17,7 @@ class _UiSignal(QObject):
     setProgressBar = Signal(int, int)
     sendCritical = Signal(str, str)
     sendInformation = Signal(str, str)
+    retranslateUi = Signal()
 
     def __init__(self):
         super().__init__()
@@ -27,6 +28,7 @@ class _AppSettingSignals(QObject):
     writeModeChanged = Signal(int)
     imageExtChanged = Signal(list)
     allowFilesChanged = Signal(list)
+    langChanged = Signal(str)
 
     def __init__(self):
         super().__init__()
