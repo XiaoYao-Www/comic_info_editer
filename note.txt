@@ -1,4 +1,4 @@
-nuitka --standalone --enable-plugin=pyside6 --disable-console --jobs=8 --lto=yes --include-qt-plugins=platforms,styles --python-flag=-O --output-dir=release app.py
+nuitka --standalone --enable-plugin=pyside6 --disable-console --jobs=8 --lto=yes --include-qt-plugins=platforms,styles --python-flag=-O --output-dir=release --include-data-dir=translations=translations app.py
 
 pyside6-lupdate lupdate_stub_help.py -ts translations/ts/zh_TW.ts -locations none
 

@@ -328,5 +328,9 @@
         <source>開始處理</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>語言選擇：</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

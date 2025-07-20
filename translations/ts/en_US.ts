@@ -245,9 +245,9 @@
         <source>逍遙 ( Xiao Yao )
 觀繁花而不與其爭艷
 處江湖而不染其煙塵</source>
-        <translation>Xiao Yao  
-Admiring the blossoms without competing in their beauty,  
-Living in the world yet untouched by its dust.</translation>
+        <translation>逍遙 ( Xiao Yao )
+觀繁花而不與其爭艷
+處江湖而不染其煙塵</translation>
     </message>
     <message>
         <source>作者 Github 連結</source>
@@ -330,6 +330,10 @@ A tool for editing ComicInfo metadata</translation>
     <message>
         <source>開始處理</source>
         <translation>Start Processing</translation>
+    </message>
+    <message>
+        <source>語言選擇：</source>
+        <translation>language:</translation>
     </message>
 </context>
 </TS>
