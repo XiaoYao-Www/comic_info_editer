@@ -18,6 +18,7 @@ class _UiSignal(QObject):
     sendCritical = Signal(str, str)
     sendInformation = Signal(str, str)
     retranslateUi = Signal()
+    comicListSelectRows = Signal(list)
 
     def __init__(self):
         super().__init__()

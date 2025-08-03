@@ -31,6 +31,11 @@ schema_config = {
             "label": "風格類型",
             "info_key": "Genre",
         },
+        "Tags": {
+            "type": QLineEdit,
+            "label": "標籤",
+            "info_key": "Tags",
+        },
         "Number": {
             "type": QLineEdit,
             "label": "集數編號",

@@ -5,12 +5,13 @@ from PySide6.QtWidgets import (
     QTextEdit, QProgressBar, QSpinBox, QScrollArea, QSizePolicy,
     QListView
 )
-from PySide6.QtCore import Qt, QSignalBlocker
+from PySide6.QtCore import Qt, QSignalBlocker, QItemSelectionModel
 import os
 # 自訂庫
 from src.global_data_store import GLOBAL_DATA_STORE
 from src.signal_bus import SIGNAL_BUS
 from src.app.model.comic_list_model import ComicListModel
+from src.classes.ui.numbered_item_delegate import NumberedItemDelegate
 ## 翻譯
 from src.translations import TR
 
@@ -70,11 +71,15 @@ class ComicsListTab(QWidget):
         # 漫畫列表
         self.comic_list = QListView()
         self.comic_list.setModel(self.comic_list_model)
-        self.comic_list.setSelectionMode(QAbstractItemView.ExtendedSelection)  # 多選
+        self.comic_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)  # 多選
         self.comic_list.setDragEnabled(True)           # 可拖曳
         self.comic_list.setAcceptDrops(True)           # 接受拖曳
         self.comic_list.setDropIndicatorShown(True)    # 顯示放置指示
         self.comic_list.setDragDropMode(QListView.InternalMove)  # 僅允許內部拖曳
+        ## 行號
+        delegate = NumberedItemDelegate()
+        self.comic_list.setItemDelegate(delegate)
+
 
         # 功能欄1
         action_layout_1 = QHBoxLayout()
@@ -134,6 +139,8 @@ class ComicsListTab(QWidget):
         SIGNAL_BUS.ui.setProgressBar.connect(self.set_progress_bar)
         # 語言刷新
         # SIGNAL_BUS.ui.retranslateUi.connect(self.retranslateUi)
+        # 重新選擇選中項
+        SIGNAL_BUS.ui.comicListSelectRows.connect(self.select_rows)
 
     def functional_construction(self):
         """ 功能建構 """
@@ -257,3 +264,18 @@ class ComicsListTab(QWidget):
         self.ext_label.setText(TR.UI_CONSTANTS["輸出副檔名："]())
         #
         self.run_btn.setText(TR.UI_CONSTANTS["開始處理"]())
+
+    def select_rows(self, rows: list[int]):
+        """ 重新選擇選中項 """
+        selection_model = self.comic_list.selectionModel()
+        model = self.comic_list.model()
+        if not selection_model or not model:
+            return
+
+        selection_model.clearSelection()
+        for row in rows:
+            index = model.index(row)
+            selection_model.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+
+        if rows:
+            self.comic_list.scrollTo(model.index(rows[0]))

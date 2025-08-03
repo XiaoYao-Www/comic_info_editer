@@ -54,6 +54,7 @@ class _tr:
             "出版月": LazyStr("出版月", "schema_config"),
             "出版日": LazyStr("出版日", "schema_config"),
             "掃描資訊": LazyStr("掃描資訊", "schema_config"),
+            "標籤": LazyStr("標籤", "schema_config"),
         }
         ## UI 固定字串
         self._UI_CONSTANTS = {

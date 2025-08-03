@@ -39,10 +39,14 @@ class ComicListModel(QAbstractListModel):
 
     def mimeData(self, indexes):
         """ 拖曳資料生成 """
-        # 拖曳時，打包索引成文字格式傳送
+        if not indexes:
+            return None
         mime_data = QMimeData()
         if indexes:
-            mime_data.setText(str(indexes[0].row()))
+            # 取得唯一 row 並排序
+            rows = sorted(set(index.row() for index in indexes))
+            # 存為逗號分隔字串
+            mime_data.setText(",".join(map(str, rows)))
         return mime_data
 
     def dropMimeData(self, data, action, row, column, parent):
@@ -51,38 +55,55 @@ class ComicListModel(QAbstractListModel):
             return False
 
         try:
-            source_row = int(data.text())
+            source_rows = list(map(int, data.text().split(",")))
         except ValueError:
             return False
 
-        if source_row < 0 or source_row >= self.rowCount():
+        if not source_rows:
             return False
 
+        max_row = self.rowCount()
+        if any(r < 0 or r >= max_row for r in source_rows):
+            return False
+
+        # 確定目標插入位置
         if row == -1:
             if parent.isValid():
-                # ✅ 拖曳到某個項目上：改用那一項的 row 作為目標
                 row = parent.row()
             else:
-                # 拖曳到空白處：插入最後
-                row = self.rowCount()
+                row = max_row
 
-        # 拖曳到原位或相鄰位 → 無需處理
-        if row == source_row or row == source_row + 1:
+        # 排除完全不動作
+        if set(source_rows) == set(range(row, row + len(source_rows))):
             return False
 
         file_list = GLOBAL_DATA_STORE.get("file_list").copy()
 
-        self.beginMoveRows(QModelIndex(), source_row, source_row, QModelIndex(), row)
+        # 保持順序：取得實際要搬移的項目（依照原先順序）
+        moving_items = [file_list[r] for r in source_rows]
 
-        item = file_list.pop(source_row)
-        if row > source_row:
-            row -= 1
-        file_list.insert(row, item)
+        # 移除搬移項（注意：由後往前刪，避免 index 位移）
+        for r in sorted(source_rows, reverse=True):
+            del file_list[r]
 
-        self.endMoveRows()
+        # 調整 row 位置（因為 source_row 被刪後 index 會往前）
+        insert_row = row
+        for r in source_rows:
+            if r < row:
+                insert_row -= 1
 
+        # 插入（依原順序）
+        for i, item in enumerate(moving_items):
+            file_list.insert(insert_row + i, item)
+
+        new_selection_rows = list(range(insert_row, insert_row + len(moving_items)))
+
+        self.beginResetModel()
         GLOBAL_DATA_STORE.update({"file_list": file_list})
-        # 排序模式改變 - 手動
+        self.endResetModel()
+
+        # 通知 UI 重新選取剛搬過來的項目
+        SIGNAL_BUS.ui.comicListSelectRows.emit(new_selection_rows)
         SIGNAL_BUS.ui.comicListSortDisplayChange.emit(0)
         return True
 
